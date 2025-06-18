@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Fourth.css';
+ import './Fourth.css';
 
 function Fourth() {
   const navigate = useNavigate();
@@ -11,6 +11,8 @@ function Fourth() {
     password: "",
     confirmpassword: ""
   });
+  const [passwordMatchError, setPasswordMatchError] = useState('');
+  const [emailExistsError, setEmailExistsError] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -18,48 +20,113 @@ function Fourth() {
       ...prevData,
       [name]: value
     }));
+    if (name === "password" || name === "confirmpassword") {
+      setPasswordMatchError('');
+    }
+    if (name === "email") {
+      setEmailExistsError('');
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    let hasErrors = false;
+
     if (formData.password !== formData.confirmpassword) {
-      alert("Passwords don't match");
-      return;
+      setPasswordMatchError("Passwords don't match");
+      hasErrors = true;
+    } else {
+      setPasswordMatchError(''); 
     }
 
-    const savedUser = JSON.parse(localStorage.getItem('user'));
-    if(savedUser && savedUser.email == formData.email){
-      alert("user already register with this email");
-          navigate('/signin');
+    const existingUsers = JSON.parse(localStorage.getItem('users')) || [];
 
-      return;
+    const userExists = existingUsers.some(user => user.email === formData.email);
+    if (userExists) {
+      setEmailExistsError("User already registered with this email. Please sign in.");
+      hasErrors = true;
+    } else {
+      setEmailExistsError('');
     }
-    
-    const { confirmpassword, ...userData } = formData;
 
-    localStorage.setItem('user', JSON.stringify(userData));
-    alert('Registration successful!');
+    if (hasErrors) {
+      return; 
+    }
+
+    const { confirmpassword, ...userData } = formData; 
+
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    alert('Registration successful!'); 
     navigate('/signin');
   };
 
   return (
-    <div className='reg'>
+    <div className='form-container'>
       <h1>REGISTRATION</h1>
       <form onSubmit={handleSubmit}>
-        <label>Name</label>
-        <input type="text" name="name" placeholder="Name" onChange={handleChange} required /><br />
+        <label htmlFor="name">Name</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          placeholder="Name"
+          value={formData.name} 
+          onChange={handleChange}
+          required
+        />
+        <br />
 
-        <label>Email</label>
-        <input type="email" name="email" placeholder="Email" onChange={handleChange} required /><br />
+        <label htmlFor="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="Email"
+          value={formData.email} 
+          onChange={handleChange}
+          required
+        />
+        {emailExistsError && <p className="error-message">{emailExistsError}</p>}
+        <br />
 
-        <label>Phone no</label>
-        <input type="tel" name="phone" placeholder="Phone no" pattern="[0-9]{10}" onChange={handleChange} required /><br />
+        <label htmlFor="phone">Phone no</label>
+        <input
+          type="tel"
+          id="phone"
+          name="phone"
+          placeholder="Phone no"
+          pattern="[0-9]{10}"
+          value={formData.phone} 
+          onChange={handleChange}
+          required
+        />
+        <br />
 
-        <label>Password</label>
-        <input type="password" name="password" placeholder="Password" onChange={handleChange} required /><br />
+        <label htmlFor="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Password"
+          value={formData.password} 
+          onChange={handleChange}
+          required
+        />
+        <br />
 
-        <label>Confirm Password</label>
-        <input type="password" name="confirmpassword" placeholder="Confirm Password" onChange={handleChange} required /><br />
+        <label htmlFor="confirmpassword">Confirm Password</label>
+        <input
+          type="password"
+          id="confirmpassword"
+          name="confirmpassword"
+          placeholder="Confirm Password"
+          value={formData.confirmpassword} 
+          onChange={handleChange}
+          required
+        />
+        {passwordMatchError && <p className="error-message">{passwordMatchError}</p>}
+        <br />
 
         <button type="submit">Register</button>
       </form>
