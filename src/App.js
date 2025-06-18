@@ -5,7 +5,7 @@ import Frist from './Frist';
 
 function App() {
   return (
-    <Router>
+    <Router basename="/001-react">
       <Routes>
         <Route path="/register" element={<Fourth />} />
         <Route path="/" element={<Frist />} /> 
@@ -13,6 +13,5 @@ function App() {
     </Router>
   );
 }
-
 
 export default App;

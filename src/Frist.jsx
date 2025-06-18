@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Frist = () => {
   const [userData, setUserData] = useState({ email: '', password: '' });
-  const navigate = useNavigate();
   const [error, setError] = useState('');
+  const navigate = useNavigate();
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUserData((prev) => ({
@@ -16,17 +17,22 @@ const Frist = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     const storedUsers = JSON.parse(localStorage.getItem('users')) || [];
 
+    // Normalize email for comparison
+    const email = userData.email.trim().toLowerCase();
+
     const foundUser = storedUsers.find(
-      (user) => user.email === userData.email && user.password === userData.password
+      (user) =>
+        user.email === email && user.password === userData.password
     );
 
     if (foundUser) {
       alert('Sign in successful!');
       navigate('/dashboard');
     } else {
-      setError('Invalid email or password!'); 
+      setError('Invalid email or password!');
     }
   };
 
@@ -40,7 +46,7 @@ const Frist = () => {
           id="email"
           name="email"
           placeholder="Email"
-          value={userData.email} 
+          value={userData.email}
           onChange={handleChange}
           required
         /><br />
@@ -58,9 +64,9 @@ const Frist = () => {
 
         {error && <p className="error-message">{error}</p>}
 
-        <div className="links"> 
-          <a href="/forget">Forgot password?</a>
-          <a href="/register">Registration page?</a>
+        <div className="links">
+          <Link to="/forget">Forgot password?</Link>
+          <Link to="/register">Registration page?</Link>
         </div>
 
         <button type="submit">Sign In</button>

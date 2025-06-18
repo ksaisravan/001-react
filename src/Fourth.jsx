@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
- import './Fourth.css';
+import './Fourth.css';
 
 function Fourth() {
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -11,6 +12,7 @@ function Fourth() {
     password: "",
     confirmpassword: ""
   });
+
   const [passwordMatchError, setPasswordMatchError] = useState('');
   const [emailExistsError, setEmailExistsError] = useState('');
 
@@ -20,6 +22,7 @@ function Fourth() {
       ...prevData,
       [name]: value
     }));
+
     if (name === "password" || name === "confirmpassword") {
       setPasswordMatchError('');
     }
@@ -33,16 +36,18 @@ function Fourth() {
 
     let hasErrors = false;
 
+    const email = formData.email.trim().toLowerCase();
+
     if (formData.password !== formData.confirmpassword) {
       setPasswordMatchError("Passwords don't match");
       hasErrors = true;
     } else {
-      setPasswordMatchError(''); 
+      setPasswordMatchError('');
     }
 
     const existingUsers = JSON.parse(localStorage.getItem('users')) || [];
+    const userExists = existingUsers.some(user => user.email === email);
 
-    const userExists = existingUsers.some(user => user.email === formData.email);
     if (userExists) {
       setEmailExistsError("User already registered with this email. Please sign in.");
       hasErrors = true;
@@ -51,14 +56,17 @@ function Fourth() {
     }
 
     if (hasErrors) {
-      return; 
+      return;
     }
 
-    const { confirmpassword, ...userData } = formData; 
+    const { confirmpassword, ...userData } = formData;
+    userData.email = email; 
+
+    const updatedUsers = [...existingUsers, userData];
 
     localStorage.setItem('users', JSON.stringify(updatedUsers));
-    alert('Registration successful!'); 
-    navigate('/signin');
+    alert('Registration successful!');
+    navigate('/Frist');
   };
 
   return (
@@ -71,7 +79,7 @@ function Fourth() {
           id="name"
           name="name"
           placeholder="Name"
-          value={formData.name} 
+          value={formData.name}
           onChange={handleChange}
           required
         />
@@ -83,7 +91,7 @@ function Fourth() {
           id="email"
           name="email"
           placeholder="Email"
-          value={formData.email} 
+          value={formData.email}
           onChange={handleChange}
           required
         />
@@ -97,7 +105,7 @@ function Fourth() {
           name="phone"
           placeholder="Phone no"
           pattern="[0-9]{10}"
-          value={formData.phone} 
+          value={formData.phone}
           onChange={handleChange}
           required
         />
@@ -109,7 +117,7 @@ function Fourth() {
           id="password"
           name="password"
           placeholder="Password"
-          value={formData.password} 
+          value={formData.password}
           onChange={handleChange}
           required
         />
@@ -121,7 +129,7 @@ function Fourth() {
           id="confirmpassword"
           name="confirmpassword"
           placeholder="Confirm Password"
-          value={formData.confirmpassword} 
+          value={formData.confirmpassword}
           onChange={handleChange}
           required
         />
